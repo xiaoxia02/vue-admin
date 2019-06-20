@@ -1,11 +1,11 @@
 # vue-admin 课程设计
 
-# install dependencies
+### install dependencies
 npm install
 
-# serve with hot reload at localhost:8081
+###  serve with hot reload at localhost:8081
 npm run dev
 
-# build for production with minification
+### build for production with minification
 npm run build
 
