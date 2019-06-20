@@ -19,7 +19,7 @@ export const addUser = params => { return axios.get(`${base}/user/add`, { params
 
 export const test1 = params => { return axios.get(`${backend}/service/`, { params: params }); };
 //显示学生信息 -GET
-export const studentInfo = params => { return axios.get(`${backend}/student/`, { params: params }); };
+export const userInfo = params => { return axios.get(`${backend}/student/`, { params: params }); };
 // 修改密码 -put
 export const changePassword = params => { return axios.put(`${backend}/password/`, { params: params }); };
 

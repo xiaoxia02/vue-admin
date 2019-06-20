@@ -6,7 +6,7 @@ const LoginUsers = [
         username: '小夏',
         password: '123456',
         avatar: 'https://gss0.bdstatic.com/94o3dSag_xI4khGkpoWK1HF6hhy/baike/s%3D500/sign=afd59e6791504fc2a65fb005d5dce7f0/b03533fa828ba61e2828da404b34970a314e599e.jpg',
-        is_superuser:true,
+        is_superuser:false,
     }
 ];
 

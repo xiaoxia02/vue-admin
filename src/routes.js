@@ -33,19 +33,21 @@ let routes = [
         iconCls: 'fa fa-id-card-o',//图标样式class
         children: [
             { path: '/', redirect: { path: '/main' }, hidden: true },
-            { path: '/main', component: Main, name: '个人信息'},
-            { path: '/course/self ', component: Course, name: '选课情况' },
+            { path: '/main', component: Main, name: '个人信息',hidden:false},
+            { path: '/course/self', component: Course, name: '选课情况',hidden:false },
             // { path: '/user', component: user, name: '列表' },
         ]
     },
     {
         path:'/',
         component:Home,
-        name:'课程',
+        name:'课程中心',
         iconCls:'fa fa-id-card-o',
+        hidden:false,
         children: [
             { path: '/course', component: Course, name: '选课' },
-        ]
+        ],
+
     },
     // {
     //     path: '/',

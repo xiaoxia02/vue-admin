@@ -1,9 +1,9 @@
 <template>
     <section>
-        <el-row ustify="center" class="student-info">
+        <el-row ustify="center" class="user-info">
             <el-card class="box-card" shadow="hover">
                 <div slot="header" class="clearfix">
-                    <span>{{student.name}}</span>
+                    <span>{{User.name}}</span>
                     <el-button style="float: right; padding: 3px 0"
                                type="text"
                                @click="dialogFormVisible = true">
@@ -11,28 +11,36 @@
                     </el-button>
                 </div>
                 <el-row :gutter="12" class="text item row-md" type="flex">
-                    <el-col :span="3">学号:</el-col>
-                    <el-col :span="9">{{student.num}}</el-col>
+                    <el-col :span="4" v-if="is_superuser()">职工号:</el-col>
+                    <el-col :span="3" v-else>学号:</el-col>
+                    <el-col :span="9">{{User.num}}</el-col>
                 </el-row>
-                <el-row :gutter="12" class="text item row-md" type="flex">
+                <el-row :gutter="12" class="text item row-md" type="flex" v-if="! is_superuser()">
                     <el-col :span="3">年级:</el-col>
-                    <el-col :span="9">{{student.grade}}</el-col>
+                    <el-col :span="9">{{User.grade}}</el-col>
                 </el-row>
-                <el-row :gutter="12" class="text item row-md" type="flex">
+                <el-row :gutter="12" class="text item row-md" type="flex" v-if="! is_superuser()">
                     <el-col :span="3">专业:</el-col>
-                    <el-col :span="9">{{student.major}}</el-col>
+                    <el-col :span="9">{{User.major}}</el-col>
                 </el-row>
-                <el-row :gutter="12" class="text item row-md" type="flex">
+                <el-row :gutter="12" class="text item row-md" type="flex" v-if="! is_superuser()">
                     <el-col :span="3">班级:</el-col>
-                    <el-col :span="9">{{student.class}}</el-col>
+                    <el-col :span="9">{{User.class}}</el-col>
                 </el-row>
-                <el-row :gutter="12" class="text item row-md" type="flex">
+                <el-row :gutter="12" class="text item row-md" type="flex" v-if="! is_superuser()">
                     <el-col :span="3">学院:</el-col>
-                    <el-col :span="9">{{student.dept}}</el-col>
+                    <el-col :span="9">{{User.dept}}</el-col>
                 </el-row>
+                <el-row :gutter="12" class="text item row-md" type="flex" v-if="! is_superuser()">
+                    <el-col>
+                        <el-link type="danger" @click="openSelection" :underline="false" style="float: right">进入选课</el-link>
+                    </el-col>
+
+                </el-row>
+
             </el-card>
         </el-row>
-
+        <!--修改密码的dialog-->
         <el-dialog title="修改密码" :visible.sync="dialogFormVisible">
             <el-form :model="form" :rules="rules" status-icon ref="form">
                 <el-form-item label="旧密码" :label-width="formLabelWidth" prop="old_pwd">
@@ -54,8 +62,8 @@
 </template>
 
 <script>
-    import {changePassword, studentInfo} from '../api/api';
-
+    import {changePassword, userInfo} from '../api/api';
+    import routes from '../routes'
     export default {
         data() {
             var validatePwd = (rule, value, callback) => {
@@ -68,7 +76,7 @@
                 }
             };
             return {
-                student: {
+                User: {
                     name: '小夏',
                     num: '16251102209',
                     class: '计算机科学与技术3班',
@@ -103,6 +111,11 @@
             }
         },
         methods: {
+            is_superuser(){
+                let user = JSON.parse(localStorage.getItem('user')|| false);
+                console.log("is_superuser:",user.is_superuser,typeof user.is_superuser);
+                return user.is_superuser
+            },
             cancel_pwd(form) {
                 this.dialogFormVisible = false;
                 this.$refs[form].resetFields();
@@ -128,14 +141,24 @@
 
             },
             // 初始化学生信息
-            getStudentInfo() {
-                studentInfo().then(data => {
-                    this.student = data.student
+            getUserInfo() {
+                userInfo().then(data => {
+                    this.User = data.user
                 })
             },
+            //进入选课
+            openSelection(){
+                routes[3]['hidden']=false;
+                this.$router.push({path: '/course'});
+            }
         },
         mounted() {
-
+            console.log(routes);
+            if (this.is_superuser()){
+                routes[2]['children'][2]['hidden']=true
+            }else {
+                routes[3]['hidden']=true
+            }
         }
     }
 
@@ -164,7 +187,7 @@
         width: 480px;
     }
 
-    .student-info {
+    .user-info {
         margin-top: 50px;
         margin-left: 28%;
 

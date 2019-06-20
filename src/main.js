@@ -62,7 +62,7 @@ new Vue({
     store,
     //components: { App }
     render: h => h(App)
-}).$mount('#app')
+}).$mount('#app');
 
 
 // http request 拦截器

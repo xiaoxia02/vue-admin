@@ -1,7 +1,7 @@
 <template>
     <section>
         <!--工具条-->
-        <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
+        <el-col :span="24" class="toolbar" style="padding-bottom: 0px; width: 100%">
             <el-form :inline="true" :model="filters" class="demo-form-inline">
                 <el-form-item label="课程ID">
                     <el-input v-model="filters.course_id" placeholder="课程ID"></el-input>
@@ -16,29 +16,35 @@
                     <el-button type="primary" @click="handleSearch()">查询</el-button>
                     <el-button v-if="is_superuser()" type="success" @click="addCourseBtn()">添加</el-button>
                 </el-form-item>
+                <el-form-item style="float: right">
+                    <el-button v-if=" !(is_superuser()|| isPath('self')) " type="danger" @click="quitCourse()"
+                               >安全退出
+                    </el-button>
+                </el-form-item>
+
             </el-form>
         </el-col>
 
         <!--列表-->
         <el-table :data="courses" highlight-current-row v-loading="listLoading"
                   style="width: 100%;">
-            <el-table-column prop="course_num" label="课程ID" width="100" sortable>
+            <el-table-column prop="course_num" label="课程ID" min-width="100" sortable>
             </el-table-column>
-            <el-table-column prop="course_name" label="课程名" width="150" sortable>
+            <el-table-column prop="course_name" label="课程名" min-width="150" sortable>
             </el-table-column>
-            <el-table-column prop="teacher_name" label="课程老师" width="120" sortable>
+            <el-table-column prop="teacher_name" label="课程老师" min-width="120" sortable>
             </el-table-column>
-            <el-table-column prop="credit" label="学分" width="100" sortable>
+            <el-table-column prop="credit" label="学分" min-width="100" sortable>
             </el-table-column>
-            <el-table-column prop="classroom" label="教室" width="120">
+            <el-table-column prop="classroom" label="教室" min-width="120">
             </el-table-column>
-            <el-table-column prop="limit_num" label="限制人数" width="120" sortable>
+            <el-table-column prop="limit_num" label="限制人数" min-width="120" sortable>
             </el-table-column>
-            <el-table-column prop="checked_num" label="已选人数" width="120" sortable>
+            <el-table-column prop="checked_num" label="已选人数" min-width="120" sortable>
             </el-table-column>
 
             <!--管理员可见-->
-            <el-table-column label="学院限制" width="240" v-if="is_superuser">
+            <el-table-column label="学院限制" min-width="240" v-if="is_superuser()">
                 <template slot-scope="scope">
                     <el-tag
                             v-for="dept in scope.row.course_dept"
@@ -48,9 +54,8 @@
                     </el-tag>
                 </template>
             </el-table-column>
-
-
-            <el-table-column label="操作" width="200">
+            <!--右侧操作栏-->
+            <el-table-column label="操作" min-width="200">
                 <!--管理员操作栏-->
                 <template slot-scope="scope">
                     <el-row v-if="is_superuser()">
@@ -80,7 +85,7 @@
             </el-table-column>
         </el-table>
 
-        <!--工具条-->
+        <!--页脚工具条-->
         <el-col :span="24" class="toolbar">
             <el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="15"
                            :total="total" style="float:right;">
@@ -126,6 +131,7 @@
 
 <script>
     import util from '../common/js/util'
+    import routes from '../routes'
     //import NProgress from 'nprogress'
     import {getUserListPage, removeUser, batchRemoveUser, editUser, addUser} from '../api/api';
     import {getCourseList, dropCourse, takeCourse, deleteCourse, editCourse, addCourse, getDeptList} from '../api/api';
@@ -173,18 +179,21 @@
         methods: {
             //url路径
             isPath(param) {
-                let pathName = window.location.pathname;
+                let pathName = this.$route.path;
+
                 let path_list = pathName.split('/');
+                console.log("pathName:", path_list.indexOf(param));
                 if (path_list.indexOf(param) === -1) {
                     return false;
                 } else {
+                    console.log('好烦');
                     return true;
                 }
             },
             //判断超级用户
             is_superuser() {
-                let user = localStorage.getItem('user') || '';
-                user = JSON.parse(user);
+                let user = JSON.parse(localStorage.getItem('user') || false);
+                console.log("is_superuser:", user.is_superuser, typeof user.is_superuser);
                 return user.is_superuser
             },
             //分页
@@ -270,6 +279,11 @@
                 });
 
             },
+            // 学生安全退出选课
+            quitCourse() {
+                this.$router.push({path: '/'});
+                routes[3]['hidden'] = false
+            },
 
 
             // ===========管理员操作课程===========
@@ -317,10 +331,8 @@
                 this.addForm.course_num = course.course_num;
                 this.addForm.limit_num = course.limit_num;
                 this.addForm.course_dept = course.course_dept;
-
                 this.addCourseVisible = true;
             },
-
 
             //取消添加课程按钮
             resetForm(formName) {
@@ -331,6 +343,7 @@
                 this.addForm.teacher_name = '';
                 this.addForm.course_dept = [];
                 this.addForm.limit_num = '';
+                this.$refs[formName].resetFields();
             },
 
 
